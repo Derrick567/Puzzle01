@@ -6,7 +6,8 @@
 1. onMeasure()的使用
 
 
-2.//傳入多個參數 ，取得最小的一個
+
+2.傳入多個參數 ，取得最小的一個
 
     private int min(int... params) {
     
@@ -23,8 +24,8 @@
     }
     
     
-3. //使用自訂sort 完成亂序
-4. 
+3. 使用自訂sort 完成亂序
+
         Collections.sort(mItemBitmaps, new Comparator<ImagePiece>() {
 
             @Override
