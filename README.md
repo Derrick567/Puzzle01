@@ -6,6 +6,7 @@
 
 
 2.//傳入多個參數 ，取得最小的一個
+
     private int min(int... params) {
     
         int min = params[0];
@@ -22,6 +23,7 @@
     
     
 3. //使用自訂sort 完成亂序
+4. 
         Collections.sort(mItemBitmaps, new Comparator<ImagePiece>() {
 
             @Override
