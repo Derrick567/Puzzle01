@@ -2,12 +2,10 @@ package com.example.user.puzzle01.com.example.user.utils;
 
 import android.graphics.Bitmap;
 
-/**
- * Created by user on 2015/8/23.
- store every piece
- */
 
+//每一個拼圖塊
 public class ImagePiece {
+
     private int index;
     private Bitmap bitmap;
 

@@ -3,10 +3,10 @@ package com.example.user.puzzle01.com.example.user.view;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.Animation;
@@ -16,6 +16,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.user.puzzle01.R;
+import com.example.user.puzzle01.com.example.user.LogManager;
 import com.example.user.puzzle01.com.example.user.utils.ImagePiece;
 import com.example.user.puzzle01.com.example.user.utils.ImageSplitterUtil;
 
@@ -23,14 +24,20 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Created by user on 2015/8/23.
- */
+
+
 public class GamePuzzleLayout extends RelativeLayout implements View.OnClickListener {
+
+    // 3 * 3 拼圖
     private int mColumn = 3;
+
     private int mPadding;
-    private int mMargin = 3;
+
+    //每個piece的邊距
+    private int mMargin = 3; //dp
+
     private ImageView[] mGamePuzzleItems;
+
     private int mItemWidth;
     private final int src = R.drawable.a4;
     //game image
@@ -122,10 +129,17 @@ public class GamePuzzleLayout extends RelativeLayout implements View.OnClickList
         init();
     }
 
+
+    //設定 layout 本身的大小
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         mWidth = Math.min(getMeasuredHeight(), getMeasuredWidth());
+        Log.d(LogManager.TAG , String.format("getMeasuredHeight() = %d , getMeasuredWidth = %d ,getWidth = %d",
+                getMeasuredHeight() ,getMeasuredWidth() , getWidth()));
+
+
+        //執行一次
         if (!once) {
             //Slicing and Sorting
             initBitmap();
@@ -133,6 +147,7 @@ public class GamePuzzleLayout extends RelativeLayout implements View.OnClickList
             initItem();
             //check if use timing;
             checkTimeEnable();
+
             once = true;
         }
 
@@ -156,13 +171,14 @@ public class GamePuzzleLayout extends RelativeLayout implements View.OnClickList
         if (mBitmap == null) {
             mBitmap = BitmapFactory.decodeResource(getResources(), src);
         }
+
         mItemBitmaps = ImageSplitterUtil.splitImage(mBitmap, mColumn);
 
         //使用自訂sort 完成亂序
         Collections.sort(mItemBitmaps, new Comparator<ImagePiece>() {
             @Override
             public int compare(ImagePiece a, ImagePiece b) {
-
+                //Math.radom() :return 0~ 1(含0 不含1)
                 return Math.random() > 0.5 ? 1 : -1;
             }
         });
@@ -170,12 +186,18 @@ public class GamePuzzleLayout extends RelativeLayout implements View.OnClickList
 
 
     private void initItem() {
-        mItemWidth = (mWidth - mPadding * 2 - mMargin * (mColumn - 1)) / mColumn;
+        //caculate each item's width
+       // mItemWidth = (mWidth - mPadding * 2 - mMargin * (mColumn - 1)) / mColumn;
+        mItemWidth = (mWidth - getPaddingLeft()-getPaddingRight() - (mColumn - 1) * mMargin) / mColumn ;
         mGamePuzzleItems = new ImageView[mColumn * mColumn];
+
+
         for (int i = 0; i < mGamePuzzleItems.length; i++) {
             ImageView item = new ImageView(getContext());
             item.setOnClickListener(this);
+
             item.setImageBitmap(mItemBitmaps.get(i).getBitmap());
+
             mGamePuzzleItems[i] = item;
             item.setId(i + 1);
             //在item(每一小格)中儲存了該位置ImagePiece index
@@ -183,8 +205,9 @@ public class GamePuzzleLayout extends RelativeLayout implements View.OnClickList
 
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(mItemWidth, mItemWidth);
 
-            // set Item 間 橫向間隙 ,use rightMargin
+
             //  not last column
+            // set item's column margin , rightMargin
             if ((i + 1) % mColumn != 0) {
                 lp.rightMargin = mMargin;
             }
@@ -208,7 +231,10 @@ public class GamePuzzleLayout extends RelativeLayout implements View.OnClickList
     private void init() {
         // dp 轉 pixel
         mMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3, getResources().getDisplayMetrics());
+
+        //如果在xml中設至多個padding，則取最小值
         mPadding = min(getPaddingLeft(), getPaddingRight(), getPaddingTop(), getPaddingBottom());
+
     }
 
     public void restart() {
@@ -265,7 +291,7 @@ public class GamePuzzleLayout extends RelativeLayout implements View.OnClickList
 
         if (mFirst == null) {
             mFirst = (ImageView) v;
-            mFirst.setColorFilter(Color.parseColor("#55FF0000"));
+            mFirst.setColorFilter(getResources().getColor(R.color.selectedColor));
         } else {
             mSecond = (ImageView) v;
             exchangeView();
@@ -281,6 +307,7 @@ public class GamePuzzleLayout extends RelativeLayout implements View.OnClickList
 
         //setUp animLayout;
         setUpAnimLayout();
+
 
         //複製欲交換兩張圖 到動畫層
         ImageView first = new ImageView(getContext());
